@@ -28,18 +28,29 @@ class SampleSimulation extends Simulation {
         http("request_1")
           .get("/")
       )
-      .rendezVous(conf.getInt("gatling.users") * 60)
-      .exec(
-        http("request_1")
-          .get("/")
-      )
 
   //  setUp(scn.inject(atOnceUsers(100)).protocols(httpProtocol))
+
+  val waveInjections = Seq(
+    nothingFor(2.0 seconds),
+    constantUsersPerSec(10) during (2.0 seconds),
+    constantUsersPerSec(20) during (2.0 seconds),
+    constantUsersPerSec(30) during (2.0 seconds),
+    constantUsersPerSec(40) during (2.0 seconds),
+    constantUsersPerSec(50) during (10 seconds),
+    constantUsersPerSec(40) during (2.0 seconds),
+    constantUsersPerSec(30) during (2.0 seconds),
+    constantUsersPerSec(20) during (2.0 seconds),
+    constantUsersPerSec(10) during (2.0 seconds),
+    nothingFor(2.0 seconds),
+  )
 
   setUp(
     scn
       .inject(
-        constantUsersPerSec(conf.getInt("gatling.users")) during (1 minute)
+//        rampUsersPerSec(1) to conf.getInt("gatling.users") during (30 seconds),
+//        constantUsersPerSec(conf.getInt("gatling.users")) during (1 minute)
+        waveInjections
       )
       .protocols(httpProtocol)
   )
